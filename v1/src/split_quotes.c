@@ -14,6 +14,8 @@
 
 void	finaly_done_with_norm(t_mshl *o)
 {
+	o->i = 0;
+	o->j = 0;
 	while (o->str && o->str[o->i])
 	{
 		while (o->str[o->i] == ' ' || o->str[o->i] == o->d)
@@ -39,21 +41,42 @@ void	finaly_done_with_norm(t_mshl *o)
 	}
 }
 
+int	check_for_semicolon(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == ';')
+		{
+			printf("minishell: syntax error near unexpected token ';'\n");
+			return (0);
+		}
+		i++;
+	}
+	return (1);
+}
+
 char	**ft_split_quotes(char *str, char d)
 {
 	t_mshl	o;
 
+	if (!check_for_semicolon(str))
+		return (NULL);
 	o.str = str;
 	o.d = d;
-	o.i = 0;
-	o.j = 0;
 	o.k = 0;
 	o.cap2 = DEFAULT_CAP;
 	o.quote = 0;
 	o.pipe = (char **)ft_malloc(o.cap2 * sizeof(char *));
 	finaly_done_with_norm(&o);
 	if (o.quote && o.d == '|')
+	{
 		ft_printf("minishell: unclosed quote haha\n");
+		ft_split_free(o.pipe);
+		return (NULL);
+	}
 	return (o.pipe);
 }
 
@@ -64,11 +87,19 @@ char	***ft_split_triple(char *line)
 	int		i;
 
 	pipe = ft_split_quotes(line, '|');
+	if (!pipe)
+		return (NULL);
 	triple = (char ***)malloc((ft_split_len(pipe) + 1) * sizeof(char **));
 	i = 0;
 	while (pipe[i])
 	{
 		triple[i] = ft_split_quotes(pipe[i], ' ');
+		if (!triple[i])
+		{
+			ft_free_triple(triple);
+			ft_split_free(pipe);
+			return (NULL);
+		}
 		i++;
 	}
 	triple[i] = NULL;

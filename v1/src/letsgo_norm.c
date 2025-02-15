@@ -22,6 +22,8 @@ void	letsgo_getready(t_mshl *m)
 	free(m->last_command);
 	m->last_command = m->cash;
 	m->triple = ft_split_triple(m->line);
+	if (!m->triple)
+		return ;
 	m->exit_res = get_redir_info(m);
 	m->i = 0;
 	m->pids[0] = 0;

@@ -38,6 +38,11 @@ void	letsgo(t_mshl *m)
 	int	eroor_line_too_long;
 
 	letsgo_getready(m);
+	if (!m->triple)
+	{
+		m->exit_status = ft_itoa(1);
+		return ;
+	}
 	if (ft_open_redirs(m))
 		return ;
 	m->comm = m->triple[0];
